@@ -77,7 +77,7 @@ document.querySelector('.playtab-container').addEventListener('click',(e)=>{
 
 function generateMultipleTab(tabEvent,val,acvtTabindex){
     _callback.funct = tabEvent.dataset.generator;
-    return `<div class='${tabEvent.dataset.class} ${(val == acvtTabindex )?'active' : ''}' data-item='${val}'
+    return `<div class='${tabEvent.dataset.class} ${(val == acvtTabindex )? tabEvent.dataset.active : ''}' data-item='${val}'
     data-function='${tabEvent.dataset.generator}' >${val} 
     <i class="${tabEvent.dataset.crossicon}"  data-closetab='${val}' aria-hidden="true" style='float:right;line-height: 19px;'></i>
     </div>`
