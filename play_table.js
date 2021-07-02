@@ -1,13 +1,15 @@
 
  var _checkbox = Array.from(document.querySelectorAll('input[type="checkbox"][name="_playcheck"]'))
 
- var _checkAll = document.querySelector('._checkAll');
+ var _checkAll = document.querySelector('#_checkAll');
 
  var _activeTabList = [];
 
  var _tabactive = [];
 
  var _playTabevent = document.querySelector('.playtab-container');
+
+ var _callback = {funct : null}
 
  _checkAll.addEventListener('click',(element)=>{
     if(element.target.checked){
@@ -46,22 +48,42 @@ document.querySelector('#openTab').addEventListener('click',()=>{
        return  generateMultipleTab(_playTabevent,e,_activeTabList[0])
     }).join('');
     _playTabevent.innerHTML = _tabItems;
-    (_playTabevent.dataset.generator)?eval(_playTabevent.dataset.generator+`('${_activeTabList[0]}')`) : ''
+    _tabactive.push(_activeTabList[0]);
+    (_playTabevent.dataset.generator)?eval(_playTabevent.dataset.generator+`('${_activeTabList[0]}')`) : null;
 })
 
 document.querySelector('.playtab-container').addEventListener('click',(e)=>{
     let _checkItem = _tabactive.find((data)=> data == e.target.dataset.item );
-    if(!_checkItem){
-        _tabactive.push(e.target.dataset.item) 
+    let _removeItem = e.target.dataset.closetab;
+    if(!_checkItem && !_removeItem){
+        _tabactive = [];
+      (e.target.dataset.item)? _tabactive.push(e.target.dataset.item):null;
     }
+    if(_removeItem){
+        let itemIndex = _activeTabList.indexOf(_removeItem);
+        let nextItem = ((itemIndex+1) != _activeTabList.length )?_activeTabList[itemIndex+1] : _activeTabList[itemIndex-1];
+        if(_removeItem == _tabactive[0]){
+            _tabactive=[];
+            _tabactive.push(nextItem);
+        }
+        _activeTabList.splice(itemIndex,1);
+      }
     let _tabItems  = _activeTabList.map((dataElement)=>{
-        return  generateMultipleTab(_playTabevent,dataElement,e.target.dataset.item)
+        return  generateMultipleTab(_playTabevent,dataElement,_tabactive[0])
      }).join('');
      _playTabevent.innerHTML = _tabItems;
-   (e.target.dataset.function)? eval(e.target.dataset.function+`('${e.target.dataset.item}')`) : ''
+     (_callback.funct)? eval(_callback.funct+`('${_tabactive[0]}')`) : null;
 })
 
 function generateMultipleTab(tabEvent,val,acvtTabindex){
+    _callback.funct = tabEvent.dataset.generator;
     return `<div class='${tabEvent.dataset.class} ${(val == acvtTabindex )?'active' : ''}' data-item='${val}'
-    data-function='${tabEvent.dataset.generator}' >${val}</div>`
+    data-function='${tabEvent.dataset.generator}' >${val} 
+    <i class="${tabEvent.dataset.crossicon}"  data-closetab='${val}' aria-hidden="true" style='float:right'></i>
+    </div>`
 }
+
+
+
+
+
